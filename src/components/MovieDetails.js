@@ -3,10 +3,20 @@ import StarRating from './StarRating'
 import Loader from './Loader'
 import { KEY } from '../App'
 
-export default function MovieDetails({ selectedId, onCloseMovie }) {
+export default function MovieDetails({
+  selectedId,
+  onCloseMovie,
+  onAddWatched,
+  watched,
+}) {
   const [movie, setMovie] = useState({})
   const [isLoading, setIsLoading] = useState(false)
+  const [userRating, setUserRating] = useState('')
 
+  const isWatched = watched.some(w => w.imdbID === selectedId)
+  const watchedUserRating = watched.find(
+    movie => movie.imdbID === selectedId
+  )?.userRating
   const {
     Title: title,
     Year: year,
@@ -19,6 +29,20 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
     Director: director,
     Genre: genre,
   } = movie
+
+  function handleAdd() {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: +imdbRating,
+      userRating,
+      runtime: +runetime.split(' ').at(0),
+    }
+    onAddWatched(newWatchedMovie)
+    onCloseMovie()
+  }
 
   useEffect(() => {
     async function getMovieDetails() {
@@ -57,7 +81,24 @@ export default function MovieDetails({ selectedId, onCloseMovie }) {
 
           <section>
             <div className="rating">
-              <StarRating maxRating={10} size={24} />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>
+                  You rated this movie {watchedUserRating} <span>⭐</span>
+                </p>
+              )}
             </div>
             <p>
               <em>{plot}</em>

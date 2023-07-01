@@ -91,7 +91,7 @@ export default function MovieDetails({
               &larr;
             </button>
             <img src={poster} alt={`Poster of ${title}`} />
-            <div class="details-overview">
+            <div className="details-overview">
               <h2>{title}</h2>
               <p>{released}</p>
               <p>{genre}</p>

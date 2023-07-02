@@ -10,7 +10,8 @@ import MovieList from './components/MovieList'
 import MovieDetails from './components/MovieDetails'
 import WatchedSummary from './components/WatchedSummary'
 import WatchedMovieList from './components/WatchedMovieList'
-import { useMovies } from './useMovies'
+import { useMovies } from './hooks/useMovies'
+import { useLocalStorageState } from './hooks/useLocalStorageState'
 
 export const average = arr =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
@@ -20,13 +21,9 @@ export const KEY = '17c07342'
 export default function App() {
   const [query, setQuery] = useState('Harry Potter')
   const [selectedId, setSelectedId] = useState(null)
-  const { movies, isLoading, error } = useMovies(query, handleCloseMovie)
+  const { movies, isLoading, error } = useMovies(query)
+  const [watched, setWatched] = useLocalStorageState([], 'watched')
 
-  // const [watched, setWatched] = useState([])
-  const [watched, setWatched] = useState(function () {
-    const storeValue = localStorage.getItem('watched') || []
-    return JSON.parse(storeValue)
-  })
   function handleSelectMovie(id) {
     setSelectedId(selectedId => (id === selectedId ? null : id))
   }
@@ -44,10 +41,6 @@ export default function App() {
   function handleRemoveWatched(id) {
     setWatched(watched => watched.filter(movie => movie.imdbID !== id))
   }
-
-  useEffect(() => {
-    localStorage.setItem('watched', JSON.stringify(watched))
-  }, [watched])
 
   return (
     <>
